@@ -110,7 +110,8 @@ export default class TransactionDetailsScreen extends React.Component<Transactio
                             <Text style={{textAlign: 'center'}}>Created by you on {this.state.editedTransaction.createdDate} </Text>
                             <Icon
                                 name='pencil'
-                                type='entypo'
+                                // type='entypo'
+                                type='antdesign'
                                 size={20}
                                 color="black"
                                 onPress={() => this.handleButtonClick()}

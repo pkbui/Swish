@@ -70,12 +70,6 @@ export interface deleteContactAction {
 export type ContactTransactionPairActionTypes = 
 addContactToTransactionAction | removeContactFromTransactionAction | editAmountAction 
 
-<<<<<<< HEAD
-export type ContactActionTypes = loadContact | readAllContact | createContactAction | updateContactAction | updateContactByPropertyAction | deleteContactAction;
-
-//Add more as we expand our redux
-export type AppActions = ContactTransactionPairActionTypes | ContactActionTypes;
-=======
 export const CREATE_TRANSACTION = 'CREATE_TRANSACTION';
 export const UPDATE_TRANSACTION = 'UPDATE_TRANSACTION';
 export const UPDATE_TRANSACTION_BY_PROPERTY = 'UPDATE_TRANSACTION_BY_PROPERTY';
@@ -106,4 +100,3 @@ export type TransactionActionTypes = updateTransactionTypeAction | updateTransac
 
 //Add more as we expand our redux
 export type AppActions = ContactTransactionPairActionTypes | TransactionActionTypes
->>>>>>> 2f1d50d291636a28120da91c747dd277bc1436a1
