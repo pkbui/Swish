@@ -10,7 +10,7 @@ import {AppState} from '../redux/root-reducer';
 import {Dispatch} from 'redux';
 import {Contact} from '../redux/types/types.Contact';
 import {AppActions} from '../redux/types/types.actions';
-import { Transaction } from '../redux/types/types.Transaction';
+import { Transaction } from '../redux/types/types.transaction';
 import { addContactToTransaction, editAmount, removeContactFromTransaction } from '../redux/contactTransactionPair/contactTransactionPair.action';
 
 

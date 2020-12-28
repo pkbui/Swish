@@ -2,8 +2,10 @@ import { Ionicons } from '@expo/vector-icons';
 import { Icon } from 'react-native-elements';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
-import * as React from 'react';
 
+import * as React from 'react';
+import BottomSheet from 'reanimated-bottom-sheet';
+import Animated from 'react-native-reanimated';
 import Colors from '../constants/Colors';
 import useColorScheme from '../hooks/useColorScheme';
 
@@ -11,17 +13,26 @@ import Home from '../screens/HomeScreen';
 import ContactScreen from '../screens/ContactScreen';
 import TransactionsOverviewScreen from '../screens/TransactionsOverviewScreen';
 import ProfileScreen from '../screens/ProfileScreen';
-
 import TransactionDetailsScreen from '../screens/TransactionDetailsScreen';
+import CreateTransaction from '../navigation/CreateTransaction'
+import ActionSheet from 'react-native-actionsheet';
+import { View, TouchableOpacity } from 'react-native';
+
+
+
+let optionTransaction = ['Standard', 'Meal', 'Recurring'];
+
+var PressedCreateTransaction = false;
 
 const BottomTab = createBottomTabNavigator();
-// const BottomTab = createBottomTabNavigator<BottomTabParamList>();
 
+// const BottomTab = createBottomTabNavigator<BottomTabParamList>();
 export default function BottomTabNavigator() {
   const colorScheme = useColorScheme();
 
+
   return (
-    <BottomTab.Navigator
+     <BottomTab.Navigator
       initialRouteName="Transactions"
       tabBarOptions={{ activeTintColor: Colors[colorScheme].tint }}>
       <BottomTab.Screen
@@ -48,6 +59,14 @@ export default function BottomTabNavigator() {
           color={color}/>
         }}
       />
+      <BottomTab.Screen
+        name = "create"
+        component = {CreateTransactionNavigator}
+        options = {{
+          tabBarButton: () => (<CreateTransaction/>)
+        }}
+      />
+
       <BottomTab.Screen
         name="Transactions"
         component={TransactionTabNavigation}
@@ -113,6 +132,10 @@ function ContactTabNavigation() {
       />
     </ContactsStackNavigator.Navigator>
   );
+}
+
+function CreateTransactionNavigator() {
+  return null
 }
 
 const TransactionsStackNavigator = createStackNavigator();

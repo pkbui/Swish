@@ -1,5 +1,5 @@
 import { CREATE_TRANSACTION, LOAD_TRANSACTIONS, UPDATE_TRANSACTION, UPDATE_TRANSACTION_BY_PROPERTY, UPDATE_TRANSACTION_TYPE, DELETE_TRANSACTION, AppActions } from '../types/types.actions';
-import {Transaction, TRANSACTION_TYPE} from '../types/types.Transaction';
+import {Transaction, TRANSACTION_TYPE} from '../types/types.transaction';
 
 const transaction_INITIAL_STATE : Transaction[] = [{
     id: "",
@@ -108,6 +108,7 @@ export const transactionReducer = (state = transaction_INITIAL_STATE, action: Ap
                 },
                 ...state.slice(indexProperty+1)
             ]
+
         default:
             return state;
     }

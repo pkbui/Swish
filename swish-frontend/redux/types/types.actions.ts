@@ -39,6 +39,12 @@ export const CREATE_CONTACT = "CREATE_CONTACT";
 export const UPDATE_CONTACT = "UPDATE_CONTACT";
 export const UPDATE_CONTACT_BY_PROPERTY = "UPDATE_CONTACT_BY_PROPERTY";
 export const DELETE_CONTACT = "DELETE_CONTACT";
+export const CLONE_CONTACTS = "CLONE_CONTACTS";
+
+export interface CloneContact {
+    type: typeof CLONE_CONTACTS,
+    contact: Contact
+}
 
 export interface loadContacts {
     type: typeof LOAD_CONTACTS
@@ -62,7 +68,7 @@ export interface updateContactByPropertyAction {
 
 export interface updateContactAction {
     type: typeof UPDATE_CONTACT, 
-    contactId: string
+    contactName: string
     contact: Contact
 }
 
@@ -71,7 +77,7 @@ export interface deleteContactAction {
     contactId: string
 }
 
-export type ContactActionTypes = loadContacts | readAllContact | createContactAction | updateContactAction | updateContactByPropertyAction | deleteContactAction;
+export type ContactActionTypes = CloneContact | loadContacts | readAllContact | createContactAction | updateContactAction | updateContactByPropertyAction | deleteContactAction;
 
 //Add more as we expand our redux
 export const CREATE_TRANSACTION = 'CREATE_TRANSACTION';

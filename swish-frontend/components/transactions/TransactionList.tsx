@@ -4,6 +4,7 @@ import {FlatList} from 'react-native';
 import { Text, View } from '../Themed';
 import TransactionCard from './TransactionCard';
 import {Transaction} from '../../redux/types/types.Transaction';
+import {Contact} from '../../redux/types/types.Contact';
 import { connect } from 'react-redux';
 import {AppState} from '../../redux/root-reducer';
 
@@ -14,14 +15,15 @@ interface TransactionListState {
 export interface TransactionListProps extends React.ComponentProps<any>{
     userId: string,
     navigationCallback : (transaction : Transaction) => void,
-    transactionList: Transaction[]
+    transactionList: Transaction[],
+    contacts: Contact[],
 }
 
 class TransactionList extends React.Component<TransactionListProps, TransactionListState>{
     constructor(props : TransactionListProps){
         super(props);
         this.state = {
-            transactions: []
+            transactions: [],
         };
     }
 
@@ -57,12 +59,14 @@ class TransactionList extends React.Component<TransactionListProps, TransactionL
 }
 
 interface StateProps {
-    transactionList: Transaction[]
+    transactionList: Transaction[],
+    contacts: Contact[]
 }
   
 const mapStateToProps = (state: AppState, ownProps : {userId: string, navigationCallback : any}): StateProps => {
     let transactionList = state.transactionReducer.filter((transaction : Transaction) => {return transaction.lenderId === ownProps.userId});
-    return {transactionList};
+    let contacts = state.contactReducer;
+    return {transactionList, contacts};
 };
  
 const styles = StyleSheet.create({

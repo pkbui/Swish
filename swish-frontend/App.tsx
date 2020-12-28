@@ -7,6 +7,12 @@ import Navigation from './navigation';
 import { Provider } from 'react-redux';
 import {createStore} from 'redux';
 import {rootReducer} from './redux/root-reducer';
+import {createStackNavigator} from '@react-navigation/stack'
+import { create } from 'lodash';
+import contactListScreen from './screens/contactListScreen'
+
+const AppStackNavigator = createStackNavigator()
+
 
 export default function App(){
   const isLoadingComplete = useCachedResources();

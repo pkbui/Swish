@@ -18,3 +18,7 @@ export const updateTransactionByProperty = (id: string, propertyName: string, va
     propertyName,
     value
 })
+
+export const loadTransactions = () : AppActions => ({
+    type: "LOAD_TRANSACTIONS"
+})
