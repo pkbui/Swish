@@ -129,3 +129,9 @@ export type TransactionActionTypes = loadTransactionsAction | updateTransactionT
 
 //Add more as we expand our redux
 export type AppActions = ContactTransactionPairActionTypes | TransactionActionTypes | ContactActionTypes
+
+export const CREATE_RECURRENCE = 'CREATE_RECURRENCE';
+export const UPDATE_RECURRENCE = 'UPDATE_RECURRENCE';
+export const DELETE_RECURRENCE = 'DELETE_RECURRENCE';
+export const LOAD_RECURRENCES = 'LOAD_RECURRENCES';
+

@@ -19,7 +19,7 @@ export var transactionData : Transaction[] = [
         lenderId: "0wn3r1e-1578-4be5-87eb-e9211fedd90f",
         transactionName: "Water Bill",
         totalAmount: 45.30,
-        note: "July water bill",
+        note: "Monthly water bill",
         createdDate: "July 10, 2021",
         paymentDate: "July 31, 2021",
         recurring: true,

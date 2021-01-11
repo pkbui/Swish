@@ -60,12 +60,6 @@ export class TransactionDetailsScreen extends React.Component<TransactionDetails
         };
     };
 
-    // updateTransactionType = (transactionType : TRANSACTION_TYPE) => {
-    //     this.setState({
-    //         transactionType
-    //     });
-    // }
-
     updateEditedTransaction = (propertyName: string, value: any) => {
         let editedTransaction : Transaction = this.state.editedTransaction;
         editedTransaction[propertyName] = value;
@@ -171,7 +165,7 @@ export class TransactionDetailsScreen extends React.Component<TransactionDetails
                             <Text style={this.state.transactionType === TRANSACTION_TYPE.MEAL ? null : {display: 'none'}}>Tax: 12%, Tips: 5%</Text>
                             <Button title={"Recurring Details"} titleStyle={{color: 'black'}} containerStyle={this.state.transactionType === TRANSACTION_TYPE.RECURRING ? null : {display: 'none'}}/>
                             <FieldInputWithLabel currentTransaction={this.state.editedTransaction} propertyName="totalAmount" label="TOTAL AMOUNT" editable={this.state.editable} updateEditedTransaction={this.updateEditedTransaction}/>        
-                            <RecurrencePicker></RecurrencePicker>
+                            {(this.state.editedTransaction.transactionType == TRANSACTION_TYPE.RECURRING) && <RecurrencePicker></RecurrencePicker>}
 
                             <Button title={"Complete Payment"} titleStyle={{color: 'black'}} buttonStyle={{backgroundColor: APP_PRIMARY_COLOR}}/>
                         </KeyboardAvoidingView>

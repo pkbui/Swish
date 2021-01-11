@@ -1,6 +1,7 @@
+import { TRANSACTION_TYPE } from "../types/types.Transaction";
 
 const INITIAL_STATE = {
-    recurrence_type : "", //should be enum
+    recurrence_type : TRANSACTION_TYPE.STANDARD, //should be enum
     separation_count : 0,
     day_of_week: "", //enum
     day_of_month: "", //enum
