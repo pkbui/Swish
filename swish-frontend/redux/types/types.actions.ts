@@ -1,6 +1,7 @@
 import {Transaction, TRANSACTION_TYPE} from './types.Transaction';
 import {Contact} from './types.contact';
 import { ContactTransactionPair } from './types.ContactTransactionPair';
+import { Recurrence } from './types.Recurrence';
 
 export const ADD_CONTACT_TO_TRANSACTION = "ADD_CONTACT_TO_TRANSACTION";
 export const ADD_CONTACTS_BY_TRANSACTION_ID = "ADD_CONTACTS_BY_TRANSACTION_ID";
@@ -125,13 +126,30 @@ export interface updateTransactionByPropertyAction {
 
 export type TransactionActionTypes = loadTransactionsAction | updateTransactionTypeAction | updateTransactionAction | updateTransactionByPropertyAction;
 
-
-
-//Add more as we expand our redux
-export type AppActions = ContactTransactionPairActionTypes | TransactionActionTypes | ContactActionTypes
-
 export const CREATE_RECURRENCE = 'CREATE_RECURRENCE';
 export const UPDATE_RECURRENCE = 'UPDATE_RECURRENCE';
 export const DELETE_RECURRENCE = 'DELETE_RECURRENCE';
 export const LOAD_RECURRENCES = 'LOAD_RECURRENCES';
+
+export interface loadRecurrenceAction {
+    type: typeof LOAD_RECURRENCES
+}
+
+export interface createRecurrenceAction {
+    type: typeof CREATE_RECURRENCE,
+    recurrence: Recurrence
+}
+
+export interface updateRecurrenceAction {
+    type: typeof UPDATE_RECURRENCE,
+    id: string,
+    updatedRecurrence: Recurrence
+}
+
+export type RecurrenceActionTypes = loadRecurrenceAction | createRecurrenceAction | updateRecurrenceAction;
+
+//Add more as we expand our redux
+export type AppActions = ContactTransactionPairActionTypes | TransactionActionTypes | ContactActionTypes | RecurrenceActionTypes;
+
+
 

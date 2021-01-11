@@ -17,7 +17,6 @@ const transaction_INITIAL_STATE : Transaction[] = [{
     transactionType: TRANSACTION_TYPE.STANDARD
 }]
 
-
 export const transactionReducer = (state = transaction_INITIAL_STATE, action: AppActions) 
 : Transaction[] => {
     switch(action.type) {

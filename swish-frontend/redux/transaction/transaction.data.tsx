@@ -23,7 +23,7 @@ export var transactionData : Transaction[] = [
         createdDate: "July 10, 2021",
         paymentDate: "July 31, 2021",
         recurring: true,
-        recurringId: "",
+        recurringId: "r3curr1ng-1878-4b0a-8bbc-025eec1b9884",
         groupId: "",
         transactionType: TRANSACTION_TYPE.RECURRING
     },
