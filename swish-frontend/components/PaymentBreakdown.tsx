@@ -25,13 +25,13 @@ interface DispatchProps {
     editAmount: Function 
 }
 
-interface ParentComponentProps {
+interface ParentProps {
     currentTransaction: Transaction,
     editable: boolean,
     saveChanges: boolean,
 }
 
-interface PaymentBreakdownProps extends StateProps, DispatchProps, ParentComponentProps {}
+interface PaymentBreakdownProps extends StateProps, DispatchProps, ParentProps {}
 
 interface PaymentBreakdownState{
     search: string,
@@ -42,30 +42,17 @@ interface PaymentBreakdownState{
     saveChanges: boolean,
 }
 
-// const actions = {
-//     addContactToTransaction: (contact: Contact, transaction: Transaction): any => true,
-//     removeContactFromTransaction: (contactId: string): any => true,
-//     removeContactsByTransactionId: (transactionIdl: string) : any => true,
-//     editAmount: (contactId: string, amount: number): any => true
-// }
-
 class PaymentBreakdown extends React.Component<PaymentBreakdownProps, PaymentBreakdownState> {
     constructor(props : PaymentBreakdownProps){
         super(props);
         this.state = {
           search: "",
           searchResultList: [], 
-          contactTransactionPairs: [],
+          contactTransactionPairs: lodash.cloneDeep(this.props.contactTransactionPairs),
           contactViewVisible: false,
           editable: this.props.editable,
           saveChanges: this.props.saveChanges,
         };
-    }
-
-    componentDidMount(){
-        this.setState({
-            contactTransactionPairs: lodash.cloneDeep(this.props.contactTransactionPairs)
-        })
     }
 
     updateSearch = (search : string) => {
@@ -130,7 +117,7 @@ class PaymentBreakdown extends React.Component<PaymentBreakdownProps, PaymentBre
     }
 
     updateContactsByTransactions = () => {
-        let changeHappened = !lodash.isEqual(this.props.contactTransactionPairs, this.state.contactTransactionPairs);
+        const changeHappened = !lodash.isEqual(this.props.contactTransactionPairs, this.state.contactTransactionPairs);
         if (changeHappened){
             this.props.removeContactsByTransactionId(this.props.currentTransaction);
             this.props.addMultipleContactTransactionPairs(this.state.contactTransactionPairs);
@@ -245,7 +232,7 @@ const styles = StyleSheet.create({
     }
 });
 
-const mapStateToProps = (state: AppState, ownProps : ParentComponentProps): StateProps => {
+const mapStateToProps = (state: AppState, ownProps : ParentProps): StateProps => {
     const contactTransactionPairs : ContactTransactionPair[] = state.contactTransactionPairReducer;
     const contacts : Contact[] = state.contactReducer;
 

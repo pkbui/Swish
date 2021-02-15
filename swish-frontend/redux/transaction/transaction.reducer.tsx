@@ -3,7 +3,7 @@ import {Transaction, TRANSACTION_TYPE} from '../types/types.Transaction';
 import * as lodash from 'lodash';
 import { transactionData }from '../transaction/transaction.data';
 
-const transaction_INITIAL_STATE : Transaction[] = [{
+const TRANSACTION_INITIAL_STATE : Transaction[] = [{
     id: "",
     lenderId: "",
     transactionName: "",
@@ -17,7 +17,7 @@ const transaction_INITIAL_STATE : Transaction[] = [{
     transactionType: TRANSACTION_TYPE.STANDARD
 }]
 
-export const transactionReducer = (state = transaction_INITIAL_STATE, action: AppActions) 
+export const transactionReducer = (state = TRANSACTION_INITIAL_STATE, action: AppActions) 
 : Transaction[] => {
     switch(action.type) {
         case LOAD_TRANSACTIONS:
@@ -25,7 +25,6 @@ export const transactionReducer = (state = transaction_INITIAL_STATE, action: Ap
         case UPDATE_TRANSACTION_TYPE:
             //find index that wants to change the transactionType
             let index = state.findIndex(transaction => transaction.id === action.transaction.id);
-
             return [
                 //before the transaction, no need to change
                 ...state.slice(0, index),
@@ -48,16 +47,15 @@ export const transactionReducer = (state = transaction_INITIAL_STATE, action: Ap
             ];
             return test;
         case UPDATE_TRANSACTION_BY_PROPERTY:
-            let indexProperty = state.findIndex(transaction => transaction.id == action.id)
-            
+            index = state.findIndex(transaction => transaction.id == action.id);
+            const updateTransaction = {
+                ...state[index],
+                [action.propertyName]: action.value
+            };            
             return [
-                ...state.slice(0,indexProperty),
-                {   
-                    //TypeScript throws an error because it expects value inside [] to be numeral, but action.propertyName is a string 
-                    //The code is still compiled and executed correctly for now, but will require changing error-checking rule later
-                    ...state[indexProperty][action.propertyName] = action.value
-                },
-                ...state.slice(indexProperty+1)
+                ...state.slice(0,index),
+                updateTransaction,                    
+                ...state.slice(index+1)
             ]
         default:
             return state;

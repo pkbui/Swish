@@ -1,22 +1,20 @@
 import * as React from 'react';
-import { StyleSheet, KeyboardAvoidingView, Platform, Route } from 'react-native';
+import { StyleSheet, KeyboardAvoidingView, Platform, Route, AppState } from 'react-native';
 import { Button, Icon, Overlay } from 'react-native-elements';
 import { Text, View } from '../components/Themed';
 import { TextInput, ScrollView} from 'react-native-gesture-handler';
 import { NavigationProp} from '@react-navigation/native';
 import RNPickerSelect from 'react-native-picker-select';
-import {APP_PRIMARY_COLOR, APP_GRADIENT_COLOR} from '../assets/theme';
+import {APP_PRIMARY_COLOR, APP_GRADIENT_COLOR} from '../constants/Colors';
 import PaymentBreakdown from '../components/PaymentBreakdown';
+import RecurrencePicker from '../components/RecurrencePicker';
 import * as lodash from 'lodash';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 import { Transaction } from '../redux/types/types.Transaction';
 import { updateTransaction, updateTransactionType } from '../redux/transaction/transaction.actions';
-import { UPDATE_TRANSACTION } from '../redux/types/types.actions';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { formatDate } from '../utility/formatDate';
-import {Picker} from '@react-native-picker/picker';
-import { toInteger } from 'lodash';
 
 interface DispatchProps {
     updateTransaction: Function,
@@ -31,18 +29,16 @@ interface TransactionDetailsProps extends DispatchProps {
 }
 
 interface TransactionDetailsState {
-    editedTransaction: Transaction,
+    currentTransaction: Transaction,
     editable: boolean,
     displaySavePrompt: boolean,
     saveChanges: boolean,
     transactionType: TRANSACTION_TYPE
 }
 
-
 const actions = {
     updateTransactionType: (transactionType: TRANSACTION_TYPE, transactionId: Transaction) : any => true,
 }
-
 
 enum TRANSACTION_TYPE{
     STANDARD, MEAL, RECURRING
@@ -52,7 +48,7 @@ export class TransactionDetailsScreen extends React.Component<TransactionDetails
     constructor (props: TransactionDetailsProps, context: any){
         super(props, context);
         this.state = {
-            editedTransaction : lodash.cloneDeep(this.props.route.params),
+            currentTransaction : lodash.cloneDeep(this.props.route.params),
             editable: false,
             displaySavePrompt: false,
             saveChanges: false,
@@ -60,15 +56,13 @@ export class TransactionDetailsScreen extends React.Component<TransactionDetails
         };
     };
 
-    updateEditedTransaction = (propertyName: string, value: any) => {
-        let editedTransaction : Transaction = this.state.editedTransaction;
-        editedTransaction[propertyName] = value;
-        this.setState({
-                editedTransaction
-            })
-        console.log("Edited value: ", this.state.editedTransaction[propertyName]);
+    updateTransaction = (key: string, value: any) => {
+        let currentTransaction : Transaction = {
+            ...this.state.currentTransaction,
+            [key] : value
+        };
+        this.setState({currentTransaction});
     }
-
 
     handleButtonClick = () => {
         this.setState({editable: !this.state.editable}, 
@@ -88,7 +82,7 @@ export class TransactionDetailsScreen extends React.Component<TransactionDetails
     }
 
     saveChanges = () => {
-        this.props.updateTransaction(this.state.editedTransaction);
+        this.props.updateTransaction(this.state.currentTransaction);
         this.setState({
             saveChanges: true,
             displaySavePrompt: false
@@ -99,7 +93,7 @@ export class TransactionDetailsScreen extends React.Component<TransactionDetails
         this.setState({
             saveChanges: false,
             displaySavePrompt: false,
-            editedTransaction: this.props.route.params
+            currentTransaction: this.props.route.params
         });
     }
     
@@ -122,7 +116,7 @@ export class TransactionDetailsScreen extends React.Component<TransactionDetails
                     {displaySaveOverlay}
                     <View style={styles.topBar}>
                         <View style={{flexDirection: "row", backgroundColor: APP_PRIMARY_COLOR, alignSelf: 'center'}}>
-                            <Text style={{textAlign: 'center'}}>Created by you on {this.state.editedTransaction.createdDate} </Text>
+                            <Text style={{textAlign: 'center'}}>Created by you on {this.state.currentTransaction.createdDate} </Text>
                             <Icon
                                 name='pencil'
                                 type='entypo'
@@ -138,7 +132,7 @@ export class TransactionDetailsScreen extends React.Component<TransactionDetails
                                 size={20}
                                 containerStyle={{alignSelf: 'center', paddingHorizontal: 2}}
                             />
-                            <Text style={{fontSize: 20, textAlign: 'center'}}>{this.state.editedTransaction.transactionName}</Text>
+                            <Text style={{fontSize: 20, textAlign: 'center'}}>{this.state.currentTransaction.transactionName}</Text>
                         </View>
                     </View>
 
@@ -152,21 +146,20 @@ export class TransactionDetailsScreen extends React.Component<TransactionDetails
                     ]}
                     onValueChange={(value) => {
                         if (value !== null)
-                            updateTransactionType(value, this.state.editedTransaction);
+                            updateTransactionType(value, this.state.currentTransaction);
                     }}
                     placeholder={{label: 'Choose Transaction Mode', value: null}}
                     />
 
                     <ScrollView style={styles.container}>
                         <KeyboardAvoidingView behavior={Platform.OS == 'android' ? 'height' : 'position'}>
-                            <FieldInputWithLabel currentTransaction={this.state.editedTransaction} propertyName="paymentDate" label="PAYMENT DEADLINE" editable={this.state.editable} updateEditedTransaction={this.updateEditedTransaction}/>                            
-                            <FieldInputWithLabel currentTransaction={this.state.editedTransaction} propertyName="note" label="NOTE" editable={this.state.editable} updateEditedTransaction={this.updateEditedTransaction}/>                            
-                            <PaymentBreakdown currentTransaction={this.state.editedTransaction} editable={this.state.editable} saveChanges={this.state.saveChanges}></PaymentBreakdown>
+                            <FieldInputWithLabel currentTransaction={this.state.currentTransaction} propertyName="paymentDate" label="PAYMENT DEADLINE" editable={this.state.editable} updateEditedTransaction={this.updateTransaction}/>                            
+                            <FieldInputWithLabel currentTransaction={this.state.currentTransaction} propertyName="note" label="NOTE" editable={this.state.editable} updateEditedTransaction={this.updateTransaction}/>                            
+                            <PaymentBreakdown currentTransaction={this.state.currentTransaction} editable={this.state.editable} saveChanges={this.state.saveChanges}></PaymentBreakdown>
                             <Text style={this.state.transactionType === TRANSACTION_TYPE.MEAL ? null : {display: 'none'}}>Tax: 12%, Tips: 5%</Text>
                             <Button title={"Recurring Details"} titleStyle={{color: 'black'}} containerStyle={this.state.transactionType === TRANSACTION_TYPE.RECURRING ? null : {display: 'none'}}/>
-                            <FieldInputWithLabel currentTransaction={this.state.editedTransaction} propertyName="totalAmount" label="TOTAL AMOUNT" editable={this.state.editable} updateEditedTransaction={this.updateEditedTransaction}/>        
-                            {(this.state.editedTransaction.transactionType == TRANSACTION_TYPE.RECURRING) && <RecurrencePicker></RecurrencePicker>}
-
+                            <FieldInputWithLabel currentTransaction={this.state.currentTransaction} propertyName="totalAmount" label="TOTAL AMOUNT" editable={this.state.editable} updateEditedTransaction={this.updateTransaction}/>        
+                            {(this.state.currentTransaction.transactionType == TRANSACTION_TYPE.RECURRING) && <RecurrencePicker recurrenceId={this.state.currentTransaction.recurringId} editable={this.state.editable} saveChanges={this.state.saveChanges}></RecurrencePicker>}
                             <Button title={"Complete Payment"} titleStyle={{color: 'black'}} buttonStyle={{backgroundColor: APP_PRIMARY_COLOR}}/>
                         </KeyboardAvoidingView>
                     </ScrollView>
@@ -227,122 +220,6 @@ function FieldInputWithLabel(props : FieldInputWithLabelProps){
     }
 }
 
-function RecurrencePicker(){ 
-    let numberOfRecurrence : number = 0;
-    const weekValue = "week";
-    const monthValue = "month";
-    const yearValue = "year";
-
-    const weekday: string[] = ["Mon", "Tues", "Wed", "Thu", "Fri", "Sat", "Sun"];
-
-    var date: string[] = [];
-    for (let i = 31; i > 0; i--){
-        date.push(lodash.toString(i));
-    }
-    date = date.reverse();
-
-    const months: string[] = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    const monthEndDate = [31, 30, 29];
-
-    const [recurrenceType, setRecurrenceType] = React.useState(weekValue);
-    const [recurrenceDistance, setRecurrenceDistance] = React.useState(0);
-    const [recurrenceInstance, setRecurrenceInstance] = React.useState(weekday[0]);
-    const [monthInstance, setMonthInstance] = React.useState(months[0]);
-    let monthEndInstance = monthEndDate[0];
-    
-    const headerText = 20;
-    const bodyText = 16;
-
-    let pickerStyling = {
-        height: 50,
-    }
-    
-    let recurrenceTypePicker = 
-    <Picker style={{width: 120, height: 30, fontSize: bodyText}} selectedValue={recurrenceType} onValueChange={(itemValue) => {setRecurrenceType(itemValue.toString())}} prompt="Recurrence Type">
-        <Picker.Item label="Week(s)" value={weekValue}/> 
-        <Picker.Item label="Month(s)" value={monthValue}/>
-        <Picker.Item label="Year(s)" value={yearValue}/>
-    </Picker>;
-
-    let recurrenceDistanceInput = 
-    <TextInput keyboardType="decimal-pad" 
-        onEndEditing={(event) => {setRecurrenceDistance(toInteger(event.nativeEvent.text))}}
-        style={{textAlignVertical: "top", fontSize: bodyText, paddingLeft: 15}}>
-        {recurrenceDistance}
-    </TextInput>;
-
-    let weeklySelector = 
-        <Picker selectedValue={recurrenceInstance} onValueChange={(itemValue) => {setRecurrenceType(itemValue.toString())}} style={pickerStyling}>
-            {weekday.map((instance) => {return <Picker.Item label={instance} value={instance}/>})}
-        </Picker>;
-
-    let monthlySelector = 
-        <Picker selectedValue={recurrenceInstance} onValueChange={(itemValue) => {setRecurrenceType(itemValue.toString())}} style={pickerStyling}>
-            {date.map((instance) => {return <Picker.Item label={instance} value={instance}/>})}
-        </Picker>;
-
-    
-    //month with 31 days
-    if(monthInstance == months[0] || monthInstance == months[2] || monthInstance == months[4] || monthInstance == months[6] || 
-        monthInstance == months[7] || monthInstance == months[9] || monthInstance == months[11]){
-        monthEndInstance = monthEndDate[0];
-        console.log("31", monthInstance);
-    }
-    else{
-        console.log("30 or 29", monthInstance);
-        //February
-        if(monthInstance == months[1]) monthEndInstance = monthEndDate[2];
-        //months with 30 days
-        else monthEndInstance = monthEndDate[1];
-    }
-
-    let yearlySelector =
-        <View style={{flexDirection: "row", height: 50}}>
-            <Picker selectedValue={recurrenceInstance} onValueChange={(itemValue) => {setRecurrenceType(itemValue.toString())}} style={{flex: 0.5}}>
-                {date.slice(0, monthEndInstance).map((instance) => {return <Picker.Item label={instance} value={instance}/>})}
-            </Picker>
-            <Picker selectedValue={monthInstance} onValueChange={(itemValue) => {setMonthInstance(itemValue.toString())}} style={{flex: 0.5}}>
-                {months.map((instance) => {return <Picker.Item label={instance} value={instance}/>})}
-            </Picker>
-        </View>;
-
-    let recurrenceInstanceSelector;
-
-    switch (recurrenceType) {
-        case weekValue:
-            recurrenceInstanceSelector = weeklySelector;
-            break;
-        case monthValue:
-            recurrenceInstanceSelector = monthlySelector;
-            break;
-        case yearValue:
-            recurrenceInstanceSelector = yearlySelector;
-            break;
-        default:
-            recurrenceInstanceSelector = weeklySelector;
-            break;
-    }
-
-    let recurrencePanel = 
-        <View>
-            <Text style={{fontSize: headerText}}>Recurrence</Text>
-            <View style={{flexDirection: "row"}}>
-                <View style={{paddingTop: 4, flexDirection: "row"}}>
-                    <Text style={{fontSize: bodyText}}>Repeat every</Text>
-                    {recurrenceDistanceInput}
-                </View>
-                {recurrenceTypePicker}
-            </View>
-            <View>
-                {yearlySelector}
-            </View>
-        </View>
-
-    return recurrencePanel;
-}
-
-
-
 const styles = StyleSheet.create({
     topBar: {
         backgroundColor: APP_PRIMARY_COLOR, 
@@ -386,7 +263,6 @@ const pickerStyle = StyleSheet.create({
 const mapDispatchToProps = (dispatch : Dispatch) => {
     return {
         updateTransaction: (transaction : Transaction) => dispatch(updateTransaction(transaction)),
-        // updateTransactionType: (transactionType, transactionId) => dispatch(updateTransactionType(transactionType, transactionId)),
     }
 }
 

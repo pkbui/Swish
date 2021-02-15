@@ -6,11 +6,12 @@ import { combineReducers } from 'redux';
 import {contactTransactionPairReducer} from './contactTransactionPair/contactTransactionPair.reducer';
 import {transactionReducer} from './transaction/transaction.reducer';
 import {contactReducer} from './contact/contact.reducer';
-
+import {recurrenceReducer} from './recurrence/recurrence.reducer';
 export const rootReducer = combineReducers({
     contactTransactionPairReducer,
     transactionReducer,
-    contactReducer
+    contactReducer,
+    recurrenceReducer
 });
 
 export type AppState = ReturnType<typeof rootReducer>

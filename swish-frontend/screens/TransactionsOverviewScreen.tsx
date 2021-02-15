@@ -4,7 +4,7 @@ import { Text, View } from '../components/Themed';
 import TransactionList from '../components/transactions/TransactionList';
 import { NavigationProp } from '@react-navigation/native';
 import { Transaction } from '../redux/types/types.Transaction';
-import { APP_PRIMARY_COLOR, APP_GRADIENT_COLOR } from '../assets/theme';
+import { APP_PRIMARY_COLOR, APP_GRADIENT_COLOR } from '../constants/Colors';
 import { LinearGradient } from 'expo-linear-gradient';
 
 

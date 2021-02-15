@@ -1,49 +1,15 @@
-import harold from '../../assets/images/profile_test.webp';
-
 import {ContactActionTypes, READ_ALL_CONTACTS, LOAD_CONTACTS, CREATE_CONTACT, UPDATE_CONTACT, UPDATE_CONTACT_BY_PROPERTY, DELETE_CONTACT} from '../types/types.actions';
 import {Contact} from '../types/types.Contact';
 import { update } from "lodash";
+import {contactsData} from "../contact/contact.data";
 
-const contact_INITIAL_STATE : Contact[] = [];
+const CONTACT_INITIAL_STATE : Contact[] = [];
 
-export const contactReducer = 
-(state = contact_INITIAL_STATE, action: ContactActionTypes)  : Contact[] => {
+export const contactReducer = (state = CONTACT_INITIAL_STATE, action: ContactActionTypes) 
+: Contact[] => {
     switch (action.type){
         case LOAD_CONTACTS:
-            const contactsDefault : Contact[] = [
-                {
-                    id: "1",
-                    ownerId: "0755850f-79a1-46f8-a06b-d169de9a23e4",
-                    userId: "",
-                    name: "Ken",
-                    email: "kentest@gmail.com",
-                    phoneNumber: "",
-                    createdDate: "Jan 20th",
-                    profilePicture: harold
-                },
-                {
-                    id: "2",
-                    ownerId: "0755850f-79a1-46f8-a06b-d169de9a23e4",
-                    userId: "",
-                    name: "Matthew",
-                    email: "matthew@gmail.com",
-                    phoneNumber: "",
-                    createdDate: "Jan 20th",
-                    profilePicture: harold
-                },
-                {
-                    id: "3",
-                    ownerId: "0755850f-79a1-46f8-a06b-d169de9a23e4",
-                    userId: "",
-                    name: "Krystal",
-                    email: "krystal@gmail.com",
-                    phoneNumber: "",
-                    createdDate: "Jan 20th",
-                    profilePicture: harold
-                }
-            ];
-            state = contactsDefault;
-            return state;
+            return contactsData;
         case READ_ALL_CONTACTS:
             return state;
         case CREATE_CONTACT:

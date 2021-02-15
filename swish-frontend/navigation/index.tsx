@@ -8,36 +8,43 @@ import BottomTabNavigator from './BottomTabNavigator';
 import LinkingConfiguration from './LinkingConfiguration';
 import {connect} from 'react-redux';
 import {Dispatch} from 'redux';
-import {LOAD_TRANSACTIONS, LOAD_CONTACTS, LOAD_CONTACT_TRANSACTION_PAIRS} from '../redux/types/types.actions';
+import {LOAD_TRANSACTIONS, LOAD_CONTACTS, LOAD_CONTACT_TRANSACTION_PAIRS, LOAD_RECURRENCES} from '../redux/types/types.actions';
 
 // If you are not familiar with React Navigation, we recommend going through the
 // "Fundamentals" guide: https://reactnavigation.org/docs/getting-started
-function Navigation({ colorScheme, loadTransactions, loadContacts, loadContactTransactionPairs} : 
-        { colorScheme: ColorSchemeName, loadTransactions: Function, loadContacts: Function, loadContactTransactionPairs: Function }) {
-  //Load Redux store data at top level component
-  loadTransactions();
-  loadContacts();
-  loadContactTransactionPairs();
-  return (
-    <NavigationContainer
-      linking={LinkingConfiguration}
-      theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <RootNavigator />
-    </NavigationContainer>
-  );
-}
 
 interface DispatchProps {
   loadTransactions: Function,
   loadContacts: Function,
   loadContactTransactionPairs: Function
+  loadRecurrence: Function
+}
+
+interface NavigationProps extends DispatchProps {
+  colorScheme : ColorSchemeName
+} 
+
+function Navigation(props : NavigationProps) {
+  //Load Redux store data at top level component
+  props.loadTransactions();
+  props.loadContacts();
+  props.loadContactTransactionPairs();
+  props.loadRecurrence();
+  return (
+    <NavigationContainer
+      linking={LinkingConfiguration}
+      theme={props.colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+      <RootNavigator />
+    </NavigationContainer>
+  );
 }
 
 const mapDispatchToProps = (dispatch: Dispatch) : DispatchProps => {
   return {
     loadTransactions: () => dispatch({type: LOAD_TRANSACTIONS}),
     loadContacts: () => dispatch({type: LOAD_CONTACTS}),
-    loadContactTransactionPairs: () => dispatch({type: LOAD_CONTACT_TRANSACTION_PAIRS})
+    loadContactTransactionPairs: () => dispatch({type: LOAD_CONTACT_TRANSACTION_PAIRS}),
+    loadRecurrence: () => dispatch({type: LOAD_RECURRENCES})
   }
 };
 
