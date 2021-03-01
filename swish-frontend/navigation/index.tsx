@@ -8,7 +8,7 @@ import BottomTabNavigator from './BottomTabNavigator';
 import LinkingConfiguration from './LinkingConfiguration';
 import {connect} from 'react-redux';
 import {Dispatch} from 'redux';
-import {LOAD_TRANSACTIONS, LOAD_CONTACTS, LOAD_CONTACT_TRANSACTION_PAIRS, LOAD_RECURRENCES} from '../redux/types/types.actions';
+import {LOAD_TRANSACTIONS, LOAD_CONTACTS, LOAD_TRANSACTION_BORROWERS_LIST, LOAD_RECURRENCES} from '../redux/types/types.actions';
 
 // If you are not familiar with React Navigation, we recommend going through the
 // "Fundamentals" guide: https://reactnavigation.org/docs/getting-started
@@ -43,7 +43,7 @@ const mapDispatchToProps = (dispatch: Dispatch) : DispatchProps => {
   return {
     loadTransactions: () => dispatch({type: LOAD_TRANSACTIONS}),
     loadContacts: () => dispatch({type: LOAD_CONTACTS}),
-    loadContactTransactionPairs: () => dispatch({type: LOAD_CONTACT_TRANSACTION_PAIRS}),
+    loadContactTransactionPairs: () => dispatch({type: LOAD_TRANSACTION_BORROWERS_LIST}),
     loadRecurrence: () => dispatch({type: LOAD_RECURRENCES})
   }
 };

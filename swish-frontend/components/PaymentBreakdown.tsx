@@ -5,24 +5,24 @@ import {StyleSheet, Text, FlatList} from 'react-native';
 import { TextInput} from 'react-native-gesture-handler';
 import {connect} from 'react-redux';
 import {Contact} from '../redux/types/types.Contact';
-import { ContactTransactionPair, PaymentStatus } from '../redux/types/types.ContactTransactionPair';
+import { TransactionBorrowers, PaymentStatus, Borrower } from '../redux/types/types.TransactionBorrowers';
 import {AppState} from '../redux/root-reducer';
 import {Dispatch} from 'redux';
 import { Transaction } from '../redux/types/types.Transaction';
-import { addMultipleContactTransactionPairs, editAmount, removeContactFromTransaction, removeContactsByTransactionId } from '../redux/contactTransactionPair/contactTransactionPair.action';
-import * as lodash from 'lodash';
+import { addMultipleTransactionBorrowers, updateTransactionBorrowers, removeBorrowerFromTransaction, removeAllBorrowersByTransactionId, addBorrowerByTransactionId } from '../redux/transactionBorrowersList/transactionBorrowersList.action';
+import * as _ from 'lodash';
 
 
 interface StateProps {
-    contactTransactionPairs: ContactTransactionPair[],
+    transactionBorrowers: TransactionBorrowers,
     contacts: Contact[]
 }
 
 interface DispatchProps {
-    addMultipleContactTransactionPairs: Function,
-    removeContactFromTransaction: Function,
-    removeContactsByTransactionId: Function,
-    editAmount: Function 
+    addBorrowersByTransactionId: Function,
+    removeBorrowerFromTransaction: Function,
+    removeAllBorrowers: Function,
+    updateTransactionBorrowers: Function 
 }
 
 interface ParentProps {
@@ -36,7 +36,7 @@ interface PaymentBreakdownProps extends StateProps, DispatchProps, ParentProps {
 interface PaymentBreakdownState{
     search: string,
     searchResultList: Contact[],
-    contactTransactionPairs: (ContactTransactionPair)[],
+    transactionBorrowers: TransactionBorrowers,
     contactViewVisible: boolean,
     editable: boolean,
     saveChanges: boolean,
@@ -48,7 +48,7 @@ class PaymentBreakdown extends React.Component<PaymentBreakdownProps, PaymentBre
         this.state = {
           search: "",
           searchResultList: [], 
-          contactTransactionPairs: lodash.cloneDeep(this.props.contactTransactionPairs),
+          transactionBorrowers: _.cloneDeep(this.props.transactionBorrowers),
           contactViewVisible: false,
           editable: this.props.editable,
           saveChanges: this.props.saveChanges,
@@ -68,39 +68,35 @@ class PaymentBreakdown extends React.Component<PaymentBreakdownProps, PaymentBre
         return this.props.contacts.filter((contact : Contact) => {return contact.name.includes(name)} );
     }
 
-    addContactToTransaction = (contact : Contact) => {
-        let transactionId = this.props.currentTransaction.id;
-        let newContactTransactionPair : ContactTransactionPair = {
-            id: "",
-            transactionId,
+    addBorrowerToTransaction = (contact : Contact) => {
+        const newBorrower : Borrower = {
             contactId: contact.id,
-            paymentStatus: PaymentStatus.Pending,
-            amountOwned: 0
+            amountBorrowed: 0,
+            paymentStatus: PaymentStatus.Unpaid
         };
-        let contactTransactionPairList = this.state.contactTransactionPairs;
-        contactTransactionPairList.push(newContactTransactionPair);
+        const transactionBorrowers = _.clone(this.state.transactionBorrowers);
+        transactionBorrowers.borrowerList.push(newBorrower);
         this.setState({
-            contactTransactionPairs: contactTransactionPairList
-        }); 
+            transactionBorrowers
+        });
     }
 
-    removeContactFromTransaction = (contactId: string) => {
-        let contactTransactionPairList = this.state.contactTransactionPairs;
-        let indexToRemove = contactTransactionPairList.findIndex((contactTransactionPair) => {return contactTransactionPair?.contactId === contactId});
-        contactTransactionPairList.splice(indexToRemove, 1);
+    removeBorrowerFromTransaction = (contactId: string) => {
+        const borrowerIndex = this.props.transactionBorrowers.borrowerList.findIndex((borrower) => {return borrower.contactId === contactId});
+        const transactionBorrowers = _.clone(this.state.transactionBorrowers);
+        transactionBorrowers.borrowerList.splice(borrowerIndex, 1);
         this.setState({
-            contactTransactionPairs: contactTransactionPairList
+            transactionBorrowers
         });
     }
 
     editAmount = (contactId : string, amount: string) => {
-        let amountNum = parseFloat(amount);
-        console.log("AMOUNT ", amountNum);
-        let indexToModify = this.state.contactTransactionPairs.findIndex((contactTransactionPair) => {return contactTransactionPair?.contactId === contactId});
-        let contactTransactionPairList = this.state.contactTransactionPairs;
-        contactTransactionPairList[indexToModify]["amountOwned"] = amountNum;
+        const amountFloat = parseFloat(amount);
+        const borrowerIndex = this.state.transactionBorrowers.borrowerList.findIndex((borrower) => {return borrower.contactId === contactId});
+        const transactionBorrowers = _.clone(this.state.transactionBorrowers);
+        transactionBorrowers.borrowerList[borrowerIndex].amountBorrowed = amountFloat;
         this.setState({
-            contactTransactionPairs: contactTransactionPairList
+            transactionBorrowers
         });
     }
 
@@ -117,13 +113,12 @@ class PaymentBreakdown extends React.Component<PaymentBreakdownProps, PaymentBre
     }
 
     updateContactsByTransactions = () => {
-        const changeHappened = !lodash.isEqual(this.props.contactTransactionPairs, this.state.contactTransactionPairs);
+        const changeHappened = !_.isEqual(this.props.transactionBorrowers, this.state.transactionBorrowers);
         if (changeHappened){
-            this.props.removeContactsByTransactionId(this.props.currentTransaction);
-            this.props.addMultipleContactTransactionPairs(this.state.contactTransactionPairs);
+            this.props.removeAllBorrowers(this.props.currentTransaction.id);
+            this.props.addBorrowersByTransactionId(this.props.currentTransaction.id, this.state.transactionBorrowers.borrowerList);
         }        
     }
-
 
     static getDerivedStateFromProps = (nextProps : PaymentBreakdownProps, prevState : PaymentBreakdownState) => {
         if(nextProps.editable !== prevState.editable){
@@ -143,12 +138,12 @@ class PaymentBreakdown extends React.Component<PaymentBreakdownProps, PaymentBre
         const search = this.state.search;
 
         //Display results of searching for contacts
-        let displayResultElement = <FlatList 
+        const displayResultElement = <FlatList 
                 data={this.state.searchResultList} 
                 renderItem={ ({item: contact}) => {
                     return(
                     <ListItem
-                    onPress={() => {this.addContactToTransaction(contact); this.setState({contactViewVisible: false});} } 
+                    onPress={() => {this.addBorrowerToTransaction(contact); this.setState({contactViewVisible: false});} } 
                     key={contact.id}>
                         <ListItem.Title>
                             {contact.name}
@@ -170,6 +165,7 @@ class PaymentBreakdown extends React.Component<PaymentBreakdownProps, PaymentBre
                         {displayResultElement}
                     </React.Fragment>
                 </Overlay>
+
                 {/* Add contact to current transaction */}
                 <View>
                     <ListItem
@@ -179,20 +175,20 @@ class PaymentBreakdown extends React.Component<PaymentBreakdownProps, PaymentBre
                             <ListItem.Title style={{color: "#ffffff"}}>
                                 {"Add Contact"}
                             </ListItem.Title>
-                            {this.state.contactTransactionPairs.map((contactTransactionPair) => (
-                                <View style={{flexDirection: 'row', borderBottomWidth: 1}} key={contactTransactionPair.id}>
+                            {this.state.transactionBorrowers.borrowerList.map((borrower) => (
+                                <View style={{flexDirection: 'row', borderBottomWidth: 1}} key={borrower.contactId}>
                                     <ListItem
                                         onPress={ () => console.log("Contact Pressed")}
                                         style={{flex: 0.8}}>
                                         <ListItem.Title style={{fontSize: 14}}>
-                                            {this.getContactById(contactTransactionPair!.contactId)!.name}
+                                            {this.getContactById(borrower!.contactId)!.name}
                                         </ListItem.Title>
                                     </ListItem>
                                     <Text style={{textAlignVertical: 'center'}}>$</Text>    
                                     <TextInput
-                                        defaultValue={contactTransactionPair!.amountOwned.toString()}
-                                        onSubmitEditing={ ({nativeEvent}) => editAmount(contactTransactionPair.contactId, parseFloat(nativeEvent.text))}
-                                        key={contactTransactionPair!.id}
+                                        defaultValue={borrower!.amountBorrowed.toString()}
+                                        onSubmitEditing={ ({nativeEvent}) => this.editAmount(borrower.contactId, nativeEvent.text)}
+                                        key={borrower!.contactId}
                                         style={{flex: 0.8, fontSize: 14}}
                                         keyboardType='number-pad'
                                         editable={this.state.editable}
@@ -208,7 +204,7 @@ class PaymentBreakdown extends React.Component<PaymentBreakdownProps, PaymentBre
                                     }
                                     type="clear"
                                     containerStyle={this.state.editable? styles.removeContactButton : styles.displayHide}
-                                    onPress={() => {removeContactFromTransaction(contactTransactionPair!.contactId)}}
+                                    onPress={() => {this.removeBorrowerFromTransaction(borrower!.contactId)}}
                                     /> 
                                 </View>
                             ))}
@@ -233,22 +229,21 @@ const styles = StyleSheet.create({
 });
 
 const mapStateToProps = (state: AppState, ownProps : ParentProps): StateProps => {
-    const contactTransactionPairs : ContactTransactionPair[] = state.contactTransactionPairReducer;
+    const transactionBorrowersList : TransactionBorrowers[] = state.transactionBorrowersListReducer;
     const contacts : Contact[] = state.contactReducer;
 
-    const currentTransactionId = ownProps.currentTransaction.id;
-    let filteredContactTransactionPairs = contactTransactionPairs.filter((contactTransactionPair) => {
-        return contactTransactionPair.transactionId == currentTransactionId;
+    const transactionBorrowers = transactionBorrowersList.find((transactionBorrowers) => {
+        return transactionBorrowers.transactionId ==  ownProps.currentTransaction.id;
     });
     
-    return {contactTransactionPairs: filteredContactTransactionPairs, contacts};
+    return {transactionBorrowers, contacts};
 };
 
 const mapDispatchToProps = (dispatch: Dispatch) : DispatchProps => ({
-    addMultipleContactTransactionPairs: (contactTransactionPairs: ContactTransactionPair[]) => dispatch(addMultipleContactTransactionPairs(contactTransactionPairs)),
-    removeContactFromTransaction: (contactId : string) => dispatch(removeContactFromTransaction(contactId)),
-    removeContactsByTransactionId: (transactionId: string) => dispatch(removeContactsByTransactionId(transactionId)),
-    editAmount: (contactId: string, amount: number) => dispatch(editAmount(contactId,amount)),
+    addBorrowersByTransactionId: (transactionId: string, borrower: Borrower[]) => dispatch(addBorrowerByTransactionId(transactionId, borrower)),
+    removeBorrowerFromTransaction: (transactionId: string, contactId : string) => dispatch(removeBorrowerFromTransaction(transactionId, contactId)),
+    removeAllBorrowers: (transactionId: string) => dispatch(removeAllBorrowersByTransactionId(transactionId)),
+    updateTransactionBorrowers: (transactionId: string, contactId: string, amount: number) => dispatch(updateTransactionBorrowers(transactionId, contactId,amount)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(PaymentBreakdown);

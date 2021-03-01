@@ -4,10 +4,14 @@ export enum PaymentStatus {
     Paid,
 }
 
-export interface ContactTransactionPair {
+export interface TransactionBorrowers {
     id: string,
     transactionId: string,
+    borrowerList: Borrower[]
+}
+
+export interface Borrower {
     contactId: string,
     paymentStatus: PaymentStatus,
-    amountOwned: number
+    amountBorrowed: number  
 }

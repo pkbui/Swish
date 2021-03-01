@@ -5,7 +5,7 @@ import { TouchableHighlight } from 'react-native-gesture-handler';
 import { Avatar } from 'react-native-elements';
 import { Transaction } from '../../redux/types/types.Transaction';
 import { Contact } from '../../redux/types/types.Contact';
-import {PaymentStatus, ContactTransactionPair} from '../../redux/types/types.ContactTransactionPair';
+import {PaymentStatus, TransactionBorrowers, Borrower} from '../../redux/types/types.TransactionBorrowers';
 import {AppState} from '../../redux/root-reducer';
 import { connect } from 'react-redux';
 
@@ -13,15 +13,13 @@ interface StateProps {
     transactionContacts: Contact[]
 }
 
-interface TransactionCardProps {
+interface TransactionCardProps extends StateProps{
     transaction: Transaction,
-    transactionContacts: Contact[], 
     navigationCallback: (transaction: Transaction) => void 
 }
 
 function TransactionCard(props: TransactionCardProps){   
     const transactionContacts = props.transactionContacts;
-
     let transactionContactName : string = transactionContacts[0].name;
     if (transactionContacts.length > 1){
         transactionContactName =  transactionContacts[0].name + " & co";
@@ -54,11 +52,10 @@ function TransactionCard(props: TransactionCardProps){
 
 
 const mapStateToProps = (state: AppState, ownProps : TransactionCardProps): StateProps => {
-    let contactTransactionPair = state.contactTransactionPairReducer.filter((contactTransactionPair : ContactTransactionPair) => {return contactTransactionPair.transactionId == ownProps.transaction.id });
-    let transactionContacts = contactTransactionPair.map((contactTransactionPair: ContactTransactionPair) => 
-        {return state.contactReducer.find((value) => value.id === contactTransactionPair.contactId)});
-
-    return {transactionContacts};
+    const transactionBorrowers = state.transactionBorrowersListReducer.find((transactionBorrowers : TransactionBorrowers) => {return transactionBorrowers.transactionId == ownProps.transaction.id });
+    const transactionContacts: Contact[] = transactionBorrowers?.borrowerList.map((borrower: Borrower) => 
+        {return state.contactReducer.find((contact) => contact.id === borrower.contactId)});
+    return {"transactionContacts": transactionContacts};
 };
 
 export default connect(mapStateToProps)(TransactionCard);

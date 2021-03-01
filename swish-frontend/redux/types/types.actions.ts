@@ -1,54 +1,55 @@
 import {Transaction, TRANSACTION_TYPE} from './types.Transaction';
 import {Contact} from './types.contact';
-import { ContactTransactionPair } from './types.ContactTransactionPair';
+import { TransactionBorrowers, Borrower} from './types.TransactionBorrowers';
 import { Recurrence } from './types.Recurrence';
 
-export const ADD_CONTACT_TO_TRANSACTION = "ADD_CONTACT_TO_TRANSACTION";
-export const ADD_CONTACTS_BY_TRANSACTION_ID = "ADD_CONTACTS_BY_TRANSACTION_ID";
-export const ADD_MULTIPLE_TRANSACTION_PAIRS = "ADD_MULTIPLE_TRANSACTION_PAIRS";
-export const EDIT_AMOUNT = "EDIT_AMOUNT";
-export const LOAD_CONTACT_TRANSACTION_PAIRS = "LOAD_CONTACT_TRANSACTION_PAIRS";
-export const REMOVE_CONTACT_FROM_TRANSACTION = "REMOVE_CONTACT_FROM_TRANSACTION";
-export const REMOVE_CONTACTS_BY_TRANSACTION_ID = "REMOVE_CONTACTS_BY_TRANSACTION_ID";
+export const ADD_NEW_TRANSACTION_BORROWER = "ADD_NEW_TRANSACTION_BORROWER";
+export const ADD_BORROWER_BY_TRANSACTION_ID = "ADD_BORROWER_BY_TRANSACTION_ID";
+export const ADD_MULTIPLE_TRANSACTION_BORROWERS = "ADD_MULTIPLE_TRANSACTION_BORROWERS";
+export const UPDATE_TRANSACTION_BORROWERS = "UPDATE_TRANSACTION_BORROWERS";
+export const LOAD_TRANSACTION_BORROWERS_LIST = "LOAD_TRANSACTION_BORROWERS_LIST";
+export const REMOVE_BORROWER_FROM_TRANSACTION = "REMOVE_BORROWER_FROM_TRANSACTION";
+export const REMOVE_ALL_BORROWERS_BY_TRANSACTION_ID = "REMOVE_ALL_BORROWERS_BY_TRANSACTION_ID";
 
-export interface loadContactTransactionPairsAction {
-    type: typeof LOAD_CONTACT_TRANSACTION_PAIRS
+export interface loadTransactionBorrowersList {
+    type: typeof LOAD_TRANSACTION_BORROWERS_LIST
 }
 
-export interface addContactToTransactionAction {
-    type: typeof ADD_CONTACT_TO_TRANSACTION,
-    contact: Contact,
-    transaction: Transaction
-}
+export interface addNewTransactionBorrowers {
+    type: typeof ADD_NEW_TRANSACTION_BORROWER,
+    transactionBorrowers: TransactionBorrowers
+} 
 
-export interface addContactsByTransactionIdAction {
-    type: typeof ADD_CONTACTS_BY_TRANSACTION_ID,
+export interface addBorrowersByTransactionId {
+    type: typeof ADD_BORROWER_BY_TRANSACTION_ID,
     transactionId: string,
-    contactTransactionPairArr: ContactTransactionPair[] 
+    borrowers: Borrower[] 
 }
 
-export interface removeContactFromTransactionAction {
-    type: typeof REMOVE_CONTACT_FROM_TRANSACTION,
+export interface removeBorrowerFromTransactionAction {
+    type: typeof REMOVE_BORROWER_FROM_TRANSACTION,
+    transactionId: string,
     contactId: string
 }
 
-export interface removeContactsByTransactionIdAction {
-    type: typeof REMOVE_CONTACTS_BY_TRANSACTION_ID,
+export interface removeAllBorrowersByTransactionId {
+    type: typeof REMOVE_ALL_BORROWERS_BY_TRANSACTION_ID,
     transactionId: string
 }
 
-export interface editAmountAction {
-    type: typeof EDIT_AMOUNT,
+export interface updateTransactionBorrowers {
+    type: typeof UPDATE_TRANSACTION_BORROWERS,
+    transactionId: string,
     contactId: string,
     amount: number
 }
 
-export interface addMultipleTransactionPairs {
-    type: typeof ADD_MULTIPLE_TRANSACTION_PAIRS,
-    contactTransactionPairs: ContactTransactionPair[]
+export interface addMultipleTransactionBorrowers {
+    type: typeof ADD_MULTIPLE_TRANSACTION_BORROWERS,
+    transactionBorrowersList: TransactionBorrowers[]
 }
 
-export type ContactTransactionPairActionTypes = loadContactTransactionPairsAction | addContactToTransactionAction | addContactsByTransactionIdAction | addMultipleTransactionPairs | removeContactFromTransactionAction | removeContactsByTransactionIdAction |editAmountAction;
+export type ContactTransactionPairActionTypes = loadTransactionBorrowersList | addNewTransactionBorrowers | addBorrowersByTransactionId | addMultipleTransactionBorrowers | removeBorrowerFromTransactionAction | removeAllBorrowersByTransactionId |updateTransactionBorrowers;
 
 export const READ_CONTACT_BY_ID = "READ_CONTACT_BY_ID";
 export const READ_CONTACT_BY_NAME = "READ_CONTACT_BY_NAME";
@@ -91,7 +92,7 @@ export interface deleteContactAction {
 }
 
 
-export type ContactActionTypes = loadContactsAction | readAllContactsAction | createContactAction | updateContactAction | updateContactByPropertyAction | deleteContactAction | removeContactsByTransactionIdAction;
+export type ContactActionTypes = loadContactsAction | readAllContactsAction | createContactAction | updateContactAction | updateContactByPropertyAction | deleteContactAction | removeAllBorrowersByTransactionId;
 
 //Add more as we expand our redux
 export const CREATE_TRANSACTION = 'CREATE_TRANSACTION';

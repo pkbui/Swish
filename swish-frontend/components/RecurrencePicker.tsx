@@ -28,6 +28,7 @@ interface ParentProps{
     saveChanges: boolean
 }
 
+//TODO: HANDLE WARNING "cannot update component from inside function body of another component"
 interface RecurrencePickerProps extends StateProps, DispatchProps, ParentProps {};
 
 function RecurrencePicker(props : RecurrencePickerProps){ 
@@ -58,7 +59,9 @@ function RecurrencePicker(props : RecurrencePickerProps){
     const [show, setShow] = React.useState(false);
 
     if(!props.editable && props.saveChanges){
-        props.updateRecurrence(currentRecurrence.id, currentRecurrence);
+        if(!lodash.isEqual(props.currentRecurrence, currentRecurrence)){
+            props.updateRecurrence(currentRecurrence.id, currentRecurrence);
+        }
     }
 
     const headerText = 16;
