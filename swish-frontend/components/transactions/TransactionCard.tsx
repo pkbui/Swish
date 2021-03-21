@@ -2,30 +2,29 @@ import * as React from 'react';
 import { Text, View } from '../Themed';
 import { StyleSheet, Image } from 'react-native';
 import { TouchableHighlight } from 'react-native-gesture-handler';
-import { TransactionSchema } from '../../data_store/Transactions';
-import { PaymentStatus, ContactSchema, TransactionContactPair } from "../../data_store/Contacts";
 import { Avatar } from 'react-native-elements';
-import {ContactsContext} from '../../data_store/Contacts'
+import { Transaction } from '../../redux/types/types.Transaction';
+import { Contact } from '../../redux/types/types.Contact';
+import {PaymentStatus, TransactionBorrowers, Borrower} from '../../redux/types/types.TransactionBorrowers';
+import {AppState} from '../../redux/root-reducer';
+import { connect } from 'react-redux';
 
-interface TransactionCardProps {
-    transaction: TransactionSchema,
-    navigationCallback: (transaction: TransactionSchema) => void 
+interface StateProps {
+    transactionContacts: Contact[]
 }
 
-export default function TransactionCard(props: TransactionCardProps){   
-    const contactContext = React.useContext(ContactsContext);
+interface TransactionCardProps extends StateProps{
+    transaction: Transaction,
+    navigationCallback: (transaction: Transaction) => void 
+}
 
-    //getContactByTransactions returns a void[], therefore required casting to ContactSchema[]
-    //however as void[] is not comparable to ContactSchema[], it requires casting to unknown
-    //TODO: Refactoring
-    const contactListVoid = contactContext.getContactsByTransaction(props.transaction.id);
-    const contactList = contactListVoid as unknown as ContactSchema[];
-
-    let transactionContactName : string = contactList[0].name;
-    if (contactList.length > 1){
-        transactionContactName =  contactList[0].name + " & co";
+function TransactionCard(props: TransactionCardProps){   
+    const transactionContacts = props.transactionContacts;
+    let transactionContactName : string = transactionContacts[0].name;
+    if (transactionContacts.length > 1){
+        transactionContactName =  transactionContacts[0].name + " & co";
     }
-
+    
     return (
         <TouchableHighlight onPress={ () => props.navigationCallback(props.transaction)}> 
             <React.Fragment>
@@ -33,7 +32,7 @@ export default function TransactionCard(props: TransactionCardProps){
                 <View style={styles.card}> 
                     <Avatar rounded
                     size="medium"
-                    source={contactList[0].profilePicture}
+                    source={transactionContacts[0].profilePicture}
                     containerStyle={styles.avatar}
                     />
                     <View style={{flexDirection: 'column', flex: 0.4}}>
@@ -50,6 +49,17 @@ export default function TransactionCard(props: TransactionCardProps){
         </TouchableHighlight>
     );
 }
+
+
+const mapStateToProps = (state: AppState, ownProps : TransactionCardProps): StateProps => {
+    const transactionBorrowers = state.transactionBorrowersListReducer.find((transactionBorrowers : TransactionBorrowers) => {return transactionBorrowers.transactionId == ownProps.transaction.id });
+    const transactionContacts: Contact[] = transactionBorrowers?.borrowerList.map((borrower: Borrower) => 
+        {return state.contactReducer.find((contact) => contact.id === borrower.contactId)});
+    return {"transactionContacts": transactionContacts};
+};
+
+export default connect(mapStateToProps)(TransactionCard);
+
 
 const styles = StyleSheet.create({
     card: {
